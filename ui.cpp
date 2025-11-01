@@ -1,10 +1,10 @@
 #include <bits/stdc++.h>
 #include <conio.h>
 #include <stdlib.h>
-#include "record.h"
+#include "manager.h"
 #include "ui.h"
 
-RecordManger recordManger(1234);
+RecordManger recordManger(1000);
 
 void clear(){
     system("clear");
@@ -28,7 +28,31 @@ void recordUIshow(){
     printf("Button h: hide record\n");
     printf("Button s: show record\n");
     printf("Button q: quit\n");
-    recordManger.showRecords();
+    recordManger.showRecordSimply();
+}
+
+void categoryUIshow(){
+    clear();
+    printf("Category Management\n");    
+    printf("Button i: insert category\n");
+    printf("Button d: delete category\n");
+    printf("Button v: set category vaild or unvaild\n");
+    printf("Button s: show record\n");
+    printf("Button c: converse record\n");
+    printf("Button q: quit\n");
+    recordManger.showRecordCategory();
+}
+
+void filterUIshow(){
+    clear();
+    printf("Filter Management\n");    
+    printf("Button h: set high amount\n");
+    printf("Button l: set low amount\n");
+    printf("Button s: set start time\n");
+    printf("Button e: set end time\n");
+    printf("Button q: quit\n");
+    recordManger.showFilter();
+    recordManger.showRecordFilter();
 }
 
 void mainUI(){
@@ -63,30 +87,35 @@ void recordUI(){
 }
 
 void categoryUI(){
-    clear();
-    printf("Hello, welcome to C!\n");    
+    int showFlag = 1;
     while(1){
-        int c = getch();
-        switch(c){
-            case 'q': return;
+        if(showFlag) categoryUIshow();
+        int button = getch();
+        switch(button){
+            case 'i': recordManger.insertCategory(); showFlag = 1; break;
+            case 'd': recordManger.deleteCategory(); showFlag = 1; break;
+            case 'v': recordManger.vaildCategory(); showFlag = 1; break;
+            case 's': recordManger.showCategory(); showFlag = 1; break;
+            case 'c': recordManger.converseCategory(); showFlag = 1; break;
+            case 'q': return; break;
+            default: showFlag = 0; 
         }
-    }
+    } 
 }
 
 void filterUI(){
-    clear();
-    printf("Hello, welcome to filterUI!\n");    
+    int showFlag = 1;
     while(1){
-        int c = getch();
-        switch(c){
-            case 'q': return;
+        if(showFlag) filterUIshow();
+        int button = getch();
+        switch(button){
+            case 'l': recordManger.setLowAmountFilter(); showFlag = 1; break;
+            case 'h': recordManger.setHighAmountFilter(); showFlag = 1; break;
+            case 's': recordManger.setStartTimeFilter(); showFlag = 1; break;
+            case 'e': recordManger.setEndTimeFilter(); showFlag = 1; break;
+            case 'q': return; break;
+            default: showFlag = 0; 
         }
-    }
+    } 
 }
 
-
-int main(){
-    mainUI();
-    clear();
-    return 0;
-}
