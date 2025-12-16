@@ -42,6 +42,12 @@ jobs:
           echo "VCPKG_ROOT=C:\vcpkg" >> $GITHUB_ENV
 
       # 步骤5：创建build目录并执行CMake配置
+      - name: Delete old build directory
+        run: |
+          # -Recurse：删除目录及所有子文件；-Force：强制删除；-ErrorAction：目录不存在时不报错
+          Remove-Item -Path ./build -Recurse -Force -ErrorAction SilentlyContinue
+        shell: powershell
+        
       - name: CMake Configure
         run: |
           mkdir -p build
