@@ -1,0 +1,102 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        // 任务1：清空build目录（清理旧缓存，可选但推荐）
+        {
+            "label": "clean build",
+            "type": "shell",
+            "command": "Remove-Item",
+            "args": [
+                "-Path", "${workspaceFolder}/build/*",
+                "-Force", "-Recurse", "-ErrorAction", "SilentlyContinue"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "shell": {
+                    "executable": "powershell.exe",
+                    "args": ["-ExecutionPolicy", "Bypass"]
+                }
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "detail": "清空build目录的旧缓存文件"
+        },
+
+        // 任务2：CMake配置（指定MinGW生成器、vcpkg的toolchain和三元组）
+        {
+            "label": "cmake configure",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "..",
+                "-G", "MinGW Makefiles",
+                "-DCMAKE_TOOLCHAIN_FILE=D:/CSTool/vcpkg/scripts/buildsystems/vcpkg.cmake",
+                "-DVCPKG_TARGET_TRIPLET=x64-mingw-static" // 匹配你安装的Gtest三元组
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build",
+                "shell": {
+                    "executable": "powershell.exe"
+                }
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "dependsOn": ["clean build"], // 先清空缓存再配置
+            "detail": "执行CMake配置，生成Makefile"
+        },
+
+        // 任务3：编译项目（cmake --build .）
+        {
+            "label": "cmake build",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build", ".",
+                "--config", "Release" // 编译Release版本，可选Debug
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build",
+                "shell": {
+                    "executable": "powershell.exe"
+                }
+            },
+            "problemMatcher": ["$gcc"], // 匹配GCC的编译错误
+            "group": {
+                "kind": "build",
+                "isDefault": true // 设为默认构建任务（Ctrl+Shift+B直接执行）
+            },
+            "dependsOn": ["cmake configure"], // 先配置再编译
+            "detail": "编译项目，生成Ledger和LedgerTest可执行文件"
+        },
+
+        // 任务4：运行Gtest测试（执行LedgerTest.exe）
+        {
+            "label": "run gtest",
+            "type": "shell",
+            "command": "${workspaceFolder}/build/LedgerTest.exe",
+            "args": [
+                // 可选：添加Gtest参数，比如只运行某个测试套件
+                // "--gtest_filter=ManagerTest.*"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build",
+                "shell": {
+                    "executable": "powershell.exe"
+                }
+            },
+            "problemMatcher": [],
+            "group": {
+                "kind": "test",
+                "isDefault": true // 设为默认测试任务
+            },
+            "dependsOn": ["cmake build"], // 先编译再运行测试
+            "detail": "运行Gtest测试程序，输出测试结果"
+        }
+    ]
+}

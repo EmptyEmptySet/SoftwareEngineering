@@ -1,0 +1,6 @@
+C:/temp/project/build/CMakeFiles/ledger_lib.dir
+C:/temp/project/build/CMakeFiles/Ledger.dir
+C:/temp/project/build/CMakeFiles/LedgerTest.dir
+C:/temp/project/build/CMakeFiles/test.dir
+C:/temp/project/build/CMakeFiles/edit_cache.dir
+C:/temp/project/build/CMakeFiles/rebuild_cache.dir

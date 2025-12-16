@@ -1,0 +1,2 @@
+D:\CSTool\msys64\ucrt64\bin\ar.exe qc libledger_lib.a CMakeFiles/ledger_lib.dir/src/ui.cpp.obj CMakeFiles/ledger_lib.dir/src/manager.cpp.obj
+D:\CSTool\msys64\ucrt64\bin\ranlib.exe libledger_lib.a
