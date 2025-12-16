@@ -1,0 +1,63 @@
+# 工作流名称：GitHub Actions CI for Gtest Unit Tests
+name: Gtest Unit Test CI
+
+# 触发条件：代码push到任意分支，或创建PR到任意分支时触发
+on:
+  push:
+    branches: [ "*" ]  # 所有分支都触发
+  pull_request:
+    branches: [ "*" ]
+
+# 定义作业：在Windows环境下执行
+jobs:
+  build-and-test:
+    # 指定运行环境：GitHub的Windows最新版虚拟机
+    runs-on: windows-latest
+
+    # 步骤：按顺序执行的命令
+    steps:
+      # 步骤1：检出仓库代码（GitHub Actions的内置动作）
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 步骤2：安装MinGW（使用Chocolatey包管理器，Windows默认自带）
+      - name: Install MinGW (x64)
+        run: |
+          choco install mingw --version=11.2.0 --force -y  # 安装MinGW x64（版本可调整）
+          # 将MinGW的bin目录添加到系统环境变量（确保cmake能找到mingw32-make）
+          echo "C:\tools\mingw64\bin" >> $GITHUB_PATH
+
+      # 步骤3：安装vcpkg（克隆vcpkg仓库到虚拟机）
+      - name: Install vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git C:\vcpkg
+          # 初始化vcpkg（生成vcpkg.exe）
+          C:\vcpkg\bootstrap-vcpkg.bat
+
+      # 步骤4：安装Gtest（x64-mingw-static版本，匹配你的本地环境）
+      - name: Install Gtest via vcpkg
+        run: |
+          C:\vcpkg\vcpkg install gtest:x64-mingw-static --triplet x64-mingw-static
+          # 设置vcpkg的环境变量，方便cmake找到toolchain
+          echo "VCPKG_ROOT=C:\vcpkg" >> $GITHUB_ENV
+
+      # 步骤5：创建build目录并执行CMake配置
+      - name: CMake Configure
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. -G "MinGW Makefiles" `
+            -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake `
+            -DVCPKG_TARGET_TRIPLET=x64-mingw-static
+
+      # 步骤6：编译项目（cmake --build .）
+      - name: CMake Build
+        run: |
+          cd build
+          cmake --build . --config Release
+
+      # 步骤7：运行Gtest单元测试并输出结果
+      - name: Run Gtest Unit Tests
+        run: |
+          cd build
+          .\LedgerTest.exe  # 执行你的测试可执行程序（和本地的名称一致）
